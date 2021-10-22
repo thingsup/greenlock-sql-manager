@@ -1,0 +1,28 @@
+{
+  "name": "@thingsup/greenlock-sql-manager",
+  "version": "1.0.0",
+  "description": "Greenlock Manager and Store for SQL Databases",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thingsup/greenlock-sql-manager.git"
+  },
+  "keywords": [
+     "greenlock",
+     "json",
+     "keypairs",
+     "certificates",
+     "store",
+     "database",
+     "sequelize"
+   ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thingsup/greenlock-sql-manager/issues"
+  },
+  "homepage": "https://github.com/thingsup/greenlock-sql-manager#readme"
+}

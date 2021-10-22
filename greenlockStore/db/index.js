@@ -1,7 +1,7 @@
 'use strict';
 
 var path = require('path');
-var sync = require('../sync.js');
+var sync = require('./sync.js');
 const {DataTypes} = require('sequelize');
 
 module.exports = function (sequelize) {

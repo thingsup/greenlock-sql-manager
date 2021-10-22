@@ -25,11 +25,7 @@ module.exports.create = function (config={}) {
             model.tableName = tablePrefix + model.name.plural;
             //model.schema = 'public';
           }
-        },
-        // Test
-        dialectOptions: {
-          socketPath: "/var/run/mysqld/mysqld.sock"
-        },
+        }
       });
     } else {
       sequelize = new Promise(function (resolve, reject) {

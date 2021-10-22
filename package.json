@@ -11,18 +11,21 @@
     "url": "git+https://github.com/thingsup/greenlock-sql-manager.git"
   },
   "keywords": [
-     "greenlock",
-     "json",
-     "keypairs",
-     "certificates",
-     "store",
-     "database",
-     "sequelize"
-   ],
+    "greenlock",
+    "json",
+    "keypairs",
+    "certificates",
+    "store",
+    "database",
+    "sequelize"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/thingsup/greenlock-sql-manager/issues"
   },
-  "homepage": "https://github.com/thingsup/greenlock-sql-manager#readme"
+  "homepage": "https://github.com/thingsup/greenlock-sql-manager#readme",
+  "dependencies": {
+    "greenlock-express": "^4.0.3"
+  }
 }

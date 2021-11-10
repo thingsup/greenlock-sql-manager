@@ -1,5 +1,7 @@
 'use strict';
 
+const { getDB } = require("../greenlockStore");
+
 const getDefaults = (opts)=>{
     const {storeDefaults={} ,defaults:m_defaults={}} = opts;
     let defaults ={
@@ -24,17 +26,22 @@ const getDefaults = (opts)=>{
 }
 
 module.exports.create = function(options = { defaults: {},storeDefaults:{}}) {
+    let storeDefaults = options.storeDefaults;
+    storeDefaults.db = getDB(storeDefaults);
+    const defaults = getDefaults(options);
+    const renewOffset = Number(defaults.renewOffset.split('d')[0] || "-45") * 24 * 3600 * 1000;    
     return {
-
-        get: async function(data) {
-            console.log('Get Enter');
-            console.log(data);
-
-            return {subject:'test8.iobot.in',altnames: ['test8.iobot.in'],createdAt: 1,updatedAt: 1};
-        },
         set:async function(opts) {
             console.log('Set Enter');
+
             console.log(opts)
+
+            const db = await storeDefaults.db;
+            await db.Domain.update({altnames: opts.altnames.join(','), renewAt: opts.renewAt},{
+                where: {
+                    subject: opts.subject
+                }
+            })
             // { subject, altnames, renewAt, deletedAt }
             // Required: updated `renewAt` and `deletedAt` for certificate matching `subject`
 
@@ -45,13 +52,32 @@ module.exports.create = function(options = { defaults: {},storeDefaults:{}}) {
         defaults: async function(opts) {
 
 
-            return getDefaults(options);
+            return defaults;
         },
 
         find :async function(opts) {
+            const db = await storeDefaults.db;
+            console.log(db)
+            const domains = await db.Domain.findAll();
+            
+    
             // { subject, servernames, altnames, renewBefore }
 
-            return [{subject:'test8.iobot.in',altnames: ['test8.iobot.in'],createdAt: 1,updatedAt: 1}];
+            return domains.map(({subject,altnames,renewAt})=>({subject,altnames: altnames.split(','),renewBefore: renewAt + renewOffset}));
         }
     };
 };
+
+module.exports.handlers = async (storeOptions)=>{
+    storeOptions.db = await getDB(storeOptions);
+    return{
+        add: ({subject='',altnames= []})=>{
+            altnames = altnames.length === 0 ? [subject]: altnames;
+            return storeOptions.db.Domain.create({
+                subject: subject,
+                altnames: altnames.join(','),
+                renewAt: 1
+            });
+        }
+    }
+}

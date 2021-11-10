@@ -8,6 +8,9 @@ module.exports = function (sequelize, DataTypes) {
     },
     altnames: {
       type: DataTypes.TEXT
+    },
+    renewAt: {
+      type: DataTypes.DATE
     }
   });
 

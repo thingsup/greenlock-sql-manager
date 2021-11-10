@@ -2,12 +2,7 @@
 
 var mkdirp = require('@root/mkdirp');
 
-module.exports.create = function (config={}) {
-  var store = {
-    options: {},
-    accounts: {},
-    certificates: {}
-  };
+module.exports.getDB = (config)=>{
   var Sequelize;
   var sequelize = config.db;
   var confDir = config.configDir || (require('os').homedir() + '/acme');
@@ -25,7 +20,7 @@ module.exports.create = function (config={}) {
             model.tableName = tablePrefix + model.name.plural;
             //model.schema = 'public';
           }
-        }
+        },
       });
     } else {
       sequelize = new Promise(function (resolve, reject) {
@@ -43,13 +38,26 @@ module.exports.create = function (config={}) {
     }
   }
 
+  return Promise.resolve(sequelize).then(function (sequelize) {
+    return require('./db')(sequelize);
+  }).catch((error)=>{
+      console.log(error);
+  });
+
+}
+
+module.exports.create = function (config={}) {
+  var store = {
+    options: {},
+    accounts: {},
+    certificates: {}
+  };
+  
+
   // This library expects config.db to resolve the db object.  We'll ensure
   // that this is the case with the provided db, as it was with the baked-in
   // db.
-  config.db = Promise.resolve(sequelize).then(function (sequelize) {
-    return require('./db')(sequelize);
-  });
-
+  config.db = getDB(config);
   store.certificates.check = function (opts) {
     return config.db.then(function (db) {
       return db.Certificate.findOne({
@@ -224,3 +232,5 @@ module.exports.create = function (config={}) {
 
   return store;
 };
+
+

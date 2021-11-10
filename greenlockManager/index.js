@@ -5,19 +5,19 @@ const { getDB } = require("../greenlockStore");
 const getDefaults = (opts)=>{
     const {storeDefaults={} ,defaults:m_defaults={}} = opts;
     let defaults ={
-        "store": {
-            "module": `${__dirname}/../greenlockStore`,
+        store: {
+            module: `${__dirname}/../greenlockStore`,
             ...storeDefaults,
         },
-        "challenges": {
+        challenges: {
           "http-01": {
-            "module": "acme-http-01-standalone"
+            module: "acme-http-01-standalone"
           }
         },
-        "renewOffset": "-45d",
-        "renewStagger": "3d",
-        "accountKeyType": "EC-P256",
-        "serverKeyType": "RSA-2048",
+        renewOffset: "-45d",
+        renewStagger: "3d",
+        accountKeyType: "EC-P256",
+        serverKeyType: "RSA-2048",
         ...m_defaults
         // "subscriberEmail": "info@iobot.in"
     };
@@ -26,10 +26,9 @@ const getDefaults = (opts)=>{
 }
 
 module.exports.create = function(options = { defaults: {},storeDefaults:{}}) {
-    let storeDefaults = options.storeDefaults;
-    storeDefaults.db = getDB(storeDefaults);
+    let storeDefaults = {};
+    storeDefaults.db = getDB(options.storeDefaults);
     const defaults = getDefaults(options);
-    const renewOffset = Number(defaults.renewOffset.split('d')[0] || "-45") * 24 * 3600 * 1000;    
     return {
         set:async function(opts) {
             console.log('Set Enter');
@@ -37,7 +36,7 @@ module.exports.create = function(options = { defaults: {},storeDefaults:{}}) {
             console.log(opts)
 
             const db = await storeDefaults.db;
-            await db.Domain.update({altnames: opts.altnames.join(','), renewAt: opts.renewAt},{
+            await db.Domain.update({renewAt: opts.renewAt},{
                 where: {
                     subject: opts.subject
                 }
@@ -56,15 +55,16 @@ module.exports.create = function(options = { defaults: {},storeDefaults:{}}) {
         },
 
         find :async function(opts) {
+            console.log('Find Enter');
+            console.log(opts);
             const db = await storeDefaults.db;
-            console.log(db)
             const domains = await db.Domain.findAll();
             const rawDomains = domains.map((value)=>{
                 const {subject,altnames,renewAt} = value.get();
                 return{
                     subject,
                     altnames:altnames.split(','),
-                    renewBefore: new Date(renewAt).getTime() + renewOffset
+                    renewAt: new Date(renewAt).getTime()=== 0 ? 1: new Date(renewAt).getTime() 
                 }
             })
 

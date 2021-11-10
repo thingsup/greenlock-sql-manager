@@ -1,8 +1,7 @@
 'use strict';
 
 var mkdirp = require('@root/mkdirp');
-
-module.exports.getDB = (config)=>{
+const getDB = (config)=>{
   var Sequelize;
   var sequelize = config.db;
   var confDir = config.configDir || (require('os').homedir() + '/acme');
@@ -37,14 +36,17 @@ module.exports.getDB = (config)=>{
       });
     }
   }
-
   return Promise.resolve(sequelize).then(function (sequelize) {
     return require('./db')(sequelize);
   }).catch((error)=>{
       console.log(error);
   });
-
 }
+
+module.exports.getDB = getDB;
+
+  
+
 
 module.exports.create = function (config={}) {
   var store = {
@@ -52,7 +54,10 @@ module.exports.create = function (config={}) {
     accounts: {},
     certificates: {}
   };
+
   
+  
+  // console.log(Object(config))
 
   // This library expects config.db to resolve the db object.  We'll ensure
   // that this is the case with the provided db, as it was with the baked-in

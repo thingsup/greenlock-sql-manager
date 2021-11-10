@@ -59,11 +59,19 @@ module.exports.create = function(options = { defaults: {},storeDefaults:{}}) {
             const db = await storeDefaults.db;
             console.log(db)
             const domains = await db.Domain.findAll();
-            
+            const rawDomains = domains.map((value)=>{
+                const {subject,altnames,renewAt} = value.get();
+                return{
+                    subject,
+                    altnames:altnames.split(','),
+                    renewBefore: new Date(renewAt).getTime() + renewOffset
+                }
+            })
+
     
             // { subject, servernames, altnames, renewBefore }
 
-            return domains.map(({subject,altnames,renewAt})=>({subject,altnames: altnames.split(','),renewBefore: renewAt + renewOffset}));
+            return rawDomains;
         }
     };
 };

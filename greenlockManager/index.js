@@ -57,16 +57,31 @@ module.exports.create = function(options = { defaults: {},storeDefaults:{}}) {
         find :async function(opts) {
             console.log('Find Enter');
             console.log(opts);
-            const db = await storeDefaults.db;
-            const domains = await db.Domain.findAll();
-            const rawDomains = domains.map((value)=>{
-                const {subject,altnames,renewAt} = value.get();
-                return{
-                    subject,
-                    altnames:altnames.split(','),
-                    renewAt: new Date(renewAt).getTime()=== 0 ? 1: new Date(renewAt).getTime() 
-                }
-            })
+            let rawDomains = []
+            if(opts.servername){
+                const db = await storeDefaults.db;
+                const domains = await db.Domain.findAll({where: {subject: opts.servername}});
+                rawDomains = domains.map((value)=>{
+                    const {subject,altnames,renewAt} = value.get();
+                    return{
+                        subject,
+                        altnames:altnames.split(','),
+                        renewAt: new Date(renewAt).getTime()=== 0 ? 1: new Date(renewAt).getTime() 
+                    }
+                })
+            }else{
+                const db = await storeDefaults.db;
+                const domains = await db.Domain.findAll();
+                rawDomains = domains.map((value)=>{
+                    const {subject,altnames,renewAt} = value.get();
+                    return{
+                        subject,
+                        altnames:altnames.split(','),
+                        renewAt: new Date(renewAt).getTime()=== 0 ? 1: new Date(renewAt).getTime() 
+                    }
+                })
+            }
+           
 
     
             // { subject, servernames, altnames, renewBefore }

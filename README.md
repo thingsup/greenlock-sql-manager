@@ -1,6 +1,8 @@
 # [@thingsup/greenlock-sql-manager](https://github.com/thingsup/greenlock-sql-manager)
 
-> A database-driven Greenlock storage plugin and manager. 
+> A database-driven Greenlock storage plugin and manager.
+
+> This library is created and maintained by [ThingsUp](https://thingsup.io)
 
 > This library is still in testing phase so may prone to bugs.
 
@@ -8,24 +10,26 @@
 
 > Lot of codebase is taken from [greenlock-store-sequelize](https://git.rootprojects.org/root/greenlock-store-sequelize.js/src/branch/master)
 
-
 ## Features
 
-* Many [Supported SQL Databases](http://docs.sequelizejs.com/manual/getting-started.html)
-  * [x] PostgreSQL (**best**)
-  * [x] SQLite3 (**easiest**)
-  * [x] Microsoft SQL Server (mssql)
-  * [x] MySQL, MariaDB
-* Works on all platforms
-  * [x] Mac, Linux, VPS
-  * [x] AWS, Heroku, Akkeris, Docker
-  * [x] Windows
+- Many [Supported SQL Databases](http://docs.sequelizejs.com/manual/getting-started.html)
+  - [x] PostgreSQL (**best**)
+  - [x] SQLite3 (**easiest**)
+  - [x] Microsoft SQL Server (mssql)
+  - [x] MySQL, MariaDB
+- Works on all platforms
+  - [x] Mac, Linux, VPS
+  - [x] AWS, Heroku, Akkeris, Docker
+  - [x] Windows
 
 ## Installation
+
 ```
 npm i @thingsup/greenlock-sql-manager
 ```
+
 You also have to install the database ORM Library which you will be using.
+
 ```
 # One of the following:
 npm install  pg pg-hstore # Postgres
@@ -40,16 +44,37 @@ npm install  tedious # Microsoft SQL Server
 To use, with express.
 
 ```js
+const express = require('express');
+const app = express();
 const glx = require('@thingsup/greenlock-sql-manager');
+glx.init(
+    {
+        greenlockDefaults: {
+          maintainerEmail: "test@example.com",
+          cluster: false,
+          packageRoot: __dirname,
 
+          // Options passed to greenlock-express library init function
+          // Most of the options are already pre-configured
+        },
+        managerDefaults: {
+          "subscriberEmail": "abc@abc.com"
+
+          // Options passed to greenlock-manager or the options which are passed in config.json of greenlock-express library
+        },
+        storeDefaults:  {
+          prefix: '<CUSTOM_PREFIX>',
+          storeDatabaseUrl: '<DB_URL>'
+        }; // Options passed to greenlock-sequelize with one additional argument prefix
+    }
+).serve(app);
 ```
 
 ## Configuration
 
-
 ## Table Structure
 
-This is the default table structure (Unless a prefix option is given) that's created. 
+This is the default table structure (Unless a prefix option is given) that's created.
 
 ```sql
 CREATE TABLE `Keypairs` (
@@ -79,11 +104,10 @@ CREATE TABLE `Certificates` (
 
 CREATE TABLE `Chains` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-  `xid` VARCHAR(255) UNIQUE,
+  `xid` VARCHAR(255),
   `content` TEXT,
   `createdAt` DATETIME NOT NULL,
   `updatedAt` DATETIME NOT NULL,
   `CertificateId` INTEGER REFERENCES
   `Certificates` (`id`) ON DELETE SET NULL ON UPDATE CASCADE);
 ```
-

@@ -34,7 +34,7 @@ gle.init(
         storeDefaults: storeOptions // Options passed to greenlock-sequelize with one additional argument prefix
 
 
-      }  
+    }  
 ).serve(app);
 
 

@@ -27,7 +27,6 @@
   "homepage": "https://github.com/thingsup/greenlock-sql-manager#readme",
   "dependencies": {
     "greenlock-express": "^4.0.3",
-    "mysql2": "^2.3.3-rc.0",
     "sequelize": "^6.9.0"
   }
 }

@@ -121,34 +121,49 @@ module.exports.handlers = async (storeOptions) => {
       try {
         const certificateData = await storeOptions.db.Certificate.findOne({
           where: {
-            subject: opts.subject,
+            subject: subject,
           },
           attributes: {
             exclude: ["createdAt", "updatedAt"],
           },
           include: {
-            model: db.Chain,
+            model: storeOptions.db.Chain,
           },
         });
+        // console.log(certificateData);
         if (certificateData) {
-          var obj = record.get();
+          var obj = certificateData.get();
+          // console.log(obj);
           if (obj.Chain) {
             obj.Chain = obj.Chain.get();
             certificates['ca'] = obj.Chain.content;
             certificates['cert'] = obj.cert;
             
-            const keyContent = await storeOptions.db.KeyPair.findOne({
+            const keyContent = await storeOptions.db.Keypair.findOne({
                 where: {
-                    xid: obj.Chain.xid
+                    xid: subject
                 }
             });
 
-            const keyObj = keyContent.get();
-            if(keyObj){
-                certificates['key'] = keyObj.content;
+            // console.log(keyContent);
+            if(keyContent){
+              const keyObj = keyContent.get();
+              if(keyObj){
+                certificates['key'] = JSON.parse(keyObj.content).privateKeyPem;
+              }else{
+                throw 'Record Not Exist';
+
+              }
             }else{
                 throw 'Record Not Exist';
+
             }
+
+            // if(keyObj){
+            //     certificates['key'] = keyObj.content;
+            // }else{
+            // }
+
             return certificates;
           }else{
               throw 'Record Not Exist';

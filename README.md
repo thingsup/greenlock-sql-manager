@@ -2,9 +2,7 @@
 
 > A database-driven Greenlock storage plugin and manager.
 
-> This library is created and maintained by [ThingsUp](https://thingsup.io)
-
-> This library is still in testing phase so may prone to bugs.
+> This library is created and maintained by [Thingsup](https://thingsup.io)
 
 > This library is compatible with Express Framework
 

@@ -72,13 +72,14 @@ glx.init(
 
 ## Manage Sites
 
-We have created a handlers function to easily manager your sites stored in database. All of them returns a promise
+We have created a handlers function to easily manage your sites stored in database.
 ```js
 const storeOptions = {
   // Pass the same objects that you have passed to storeDefaults
 };
 const glx = require("@thingsup/greenlock-sql-manager");
 const { add, getCertificates, getDB } = glx.handles(storeOptions);
+// List of the functions that we currently support.
 ```
 
 ### Adding Sites

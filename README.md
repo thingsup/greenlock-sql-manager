@@ -8,7 +8,7 @@
 
 > Lot of codebase is taken from [greenlock-store-sequelize](https://git.rootprojects.org/root/greenlock-store-sequelize.js/src/branch/master)
 
-## Features
+# Features
 
 - Many [Supported SQL Databases](http://docs.sequelizejs.com/manual/getting-started.html)
   - [x] PostgreSQL (**best**)
@@ -20,7 +20,7 @@
   - [x] AWS, Heroku, Akkeris, Docker
   - [x] Windows
 
-## Installation
+# Installation
 
 ```
 npm i @thingsup/greenlock-sql-manager
@@ -37,7 +37,9 @@ npm install  sqlite3
 npm install  tedious # Microsoft SQL Server
 ```
 
-## Usage
+# Usage
+
+## Running Express App
 
 To use, with express.
 
@@ -68,9 +70,57 @@ glx.init(
 ).serve(app);
 ```
 
-## Configuration
+## Manage Sites
 
-## Table Structure
+We have created a handlers function to easily manager your sites stored in database. All of them returns a promise
+```js
+const storeOptions = {
+  // Pass the same objects that you have passed to storeDefaults
+};
+const glx = require("@thingsup/greenlock-sql-manager");
+const { add, getCertificates, getDB } = glx.handles(storeOptions);
+```
+
+### Adding Sites
+To add a site,
+```js
+try {
+  await add({
+    subject: "example.com",
+    altnames: ["www.example.com", "example.com"],
+  });
+  console.log("Site added");
+} catch (err) {
+  console.log("Unable to add sites");
+}
+```
+
+### Getting Certificates and keys of a site
+Get keys and certificates necessary to run https server
+```js
+try {
+  const certOpts = await getCertificates("example.com");
+  /* returns {
+     ca: '....',
+     key: '...', // Private Key
+     cert: '...'
+   }  (certificate exist) || null (certicate not exist)
+  */
+} catch (err) {
+  console.log("Error Occured");
+}
+```
+
+### Get Sequelize DB Instance
+``` js
+try {
+  const db = await getDB();
+} catch (err) {
+  console.log("Error Occured");
+}
+```
+
+# Default Table Structure
 
 This is the default table structure (Unless a prefix option is given) that's created.
 

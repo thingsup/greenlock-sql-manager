@@ -100,18 +100,21 @@ module.exports.create = function (
   };
 };
 
-module.exports.handlers = async (storeOptions) => {
-  storeOptions.db = await getDB(storeOptions);
+module.exports.handlers = (storeOptions) => {
   return {
-    add: ({ subject = "", altnames = [] }) => {
+    add: async ({ subject = "", altnames = [] }) => {
       altnames = altnames.length === 0 ? [subject] : altnames;
+      storeOptions.db = await getDB(storeOptions);
       return storeOptions.db.Domain.create({
         subject: subject,
         altnames: altnames.join(","),
         renewAt: 1,
       });
     },
-    getCertificates: async (subject = "") => {
+
+    // @params sub: subject
+    getCertificates: async ( sub = "") => {
+      storeOptions.db = await getDB(storeOptions);
         
       const certificates = {
           ca: '',
@@ -121,7 +124,7 @@ module.exports.handlers = async (storeOptions) => {
       try {
         const certificateData = await storeOptions.db.Certificate.findOne({
           where: {
-            subject: subject,
+            subject: sub,
           },
           attributes: {
             exclude: ["createdAt", "updatedAt"],
@@ -141,7 +144,7 @@ module.exports.handlers = async (storeOptions) => {
             
             const keyContent = await storeOptions.db.Keypair.findOne({
                 where: {
-                    xid: subject
+                    xid: sub // Don't use xid of chain. They do not link
                 }
             });
 
@@ -175,7 +178,8 @@ module.exports.handlers = async (storeOptions) => {
         return null;
       }
     },
-    getDB: ()=>{
+    getDB: async ()=>{
+        storeOptions.db = await getDB(storeOptions);
         return storeOptions.db;
     }
   };

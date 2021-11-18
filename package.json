@@ -1,6 +1,6 @@
 {
   "name": "@thingsup/greenlock-sql-manager",
-  "version": "1.0.10",
+  "version": "1.0.12",
   "description": "Greenlock Manager and Store for SQL Databases",
   "main": "index.js",
   "scripts": {
@@ -23,6 +23,9 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/thingsup/greenlock-sql-manager/issues"
+  },
+  "publishConfig": {
+    "registry":"https://npm.pkg.github.com/"
   },
   "homepage": "https://github.com/thingsup/greenlock-sql-manager#readme",
   "dependencies": {

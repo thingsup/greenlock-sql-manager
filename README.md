@@ -44,35 +44,36 @@ npm install  tedious # Microsoft SQL Server
 To use, with express.
 
 ```js
-const express = require('express');
+const express = require("express");
 const app = express();
-const glx = require('@thingsup/greenlock-sql-manager');
-glx.init(
-    {
-        greenlockDefaults: {
-          maintainerEmail: "test@example.com",
-          cluster: false,
-          packageRoot: __dirname,
+const glx = require("@thingsup/greenlock-sql-manager");
+glx
+  .init({
+    greenlockDefaults: {
+      maintainerEmail: "test@example.com",
+      cluster: false,
+      packageRoot: __dirname,
 
-          // Options passed to greenlock-express library init function
-          // Most of the options are already pre-configured
-        },
-        managerDefaults: {
-          "subscriberEmail": "abc@abc.com"
+      // Options passed to greenlock-express library init function
+      // Most of the options are already pre-configured
+    },
+    managerDefaults: {
+      subscriberEmail: "abc@abc.com",
 
-          // Options passed to greenlock-manager or the options which are passed in config.json of greenlock-express library
-        },
-        storeDefaults:  {
-          prefix: '<CUSTOM_PREFIX>',
-          storeDatabaseUrl: '<DB_URL>'
-        }; // Options passed to greenlock-sequelize with one additional argument prefix
-    }
-).serve(app);
+      // Options passed to greenlock-manager or the options which are passed in config.json of greenlock-express library
+    },
+    storeDefaults: {
+      prefix: "<CUSTOM_PREFIX>",
+      storeDatabaseUrl: "<DB_URL>",
+    }, // Options passed to greenlock-sequelize with one additional argument prefix
+  })
+  .serve(app);
 ```
 
 ## Manage Sites
 
 We have created a handlers function to easily manage your sites stored in database.
+
 ```js
 const storeOptions = {
   // Pass the same objects that you have passed to storeDefaults
@@ -83,7 +84,9 @@ const { add, getCertificates, getDB } = glx.handles(storeOptions);
 ```
 
 ### Adding Sites
+
 To add a site,
+
 ```js
 try {
   await add({
@@ -97,7 +100,9 @@ try {
 ```
 
 ### Getting Certificates and keys of a site
+
 Get keys and certificates necessary to run https server
+
 ```js
 try {
   const certOpts = await getCertificates("example.com");
@@ -113,12 +118,74 @@ try {
 ```
 
 ### Get Sequelize DB Instance
-``` js
+
+```js
 try {
   const db = await getDB();
 } catch (err) {
   console.log("Error Occured");
 }
+```
+
+### Opening TCP/IP socket using TLS
+
+```js
+const express = require("express");
+const app = express();
+const glx = require("@thingsup/greenlock-sql-manager");
+let server = null;
+const storeOptions = {
+  prefix: "<CUSTOM_PREFIX>",
+  storeDatabaseUrl: "<DB_URL>",
+};
+
+const PORT = 8888;
+const startServer = (certificates) => {
+  // Incase of renewal, we can either restart the whole process. or close the existing server and then start it with new certificate.
+  if (server) {
+    server.close(() => {
+      server = require("tls").createServer(certificates, () => {});
+      server.listen(PORT);
+    });
+  } else {
+    server = require("tls").createServer(certificates, () => {});
+    server.listen(PORT);
+  }
+};
+
+const siteHandles = glx.handles(storeOptions);
+
+const getCertificateAndRunServer = () => {
+  siteHandles.getCertificate("yourdomain.com").then((certs) => {
+    if (certs) {
+      // Certificate exist
+      startServer(certs);
+    } else {
+    } // certificate not exist. wait for the certificate issue.
+  });
+};
+
+getCertificateAndRunServer();
+
+glx
+  .init({
+    greenlockDefaults: {
+      maintainerEmail: "test@example.com",
+      cluster: false,
+      packageRoot: __dirname,
+      notify: (ev) => {
+        if (ev.trim() === "cert_issue" || ev.trim() === "cert_renewal") {
+          // Certificate is either issued or renewed now you have to change your socket's certificate
+          getCertificateAndRunServer();
+        }
+      },
+    },
+    managerDefaults: {
+      subscriberEmail: "abc@abc.com",
+    },
+    storeDefaults: storeOptions,
+  })
+  .serve(app);
 ```
 
 # Default Table Structure

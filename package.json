@@ -1,6 +1,6 @@
 {
   "name": "@thingsup/greenlock-sql-manager",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Greenlock Manager and Store for SQL Databases",
   "main": "index.js",
   "scripts": {

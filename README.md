@@ -204,6 +204,7 @@ CREATE TABLE `Domains` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `subject` VARCHAR(255) UNIQUE,
   `altnames` TEXT,
+  `renewAt` DATE,
   `createdAt` DATETIME NOT NULL,
   `updatedAt` DATETIME NOT NULL);
 

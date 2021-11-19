@@ -104,8 +104,8 @@ module.exports.handlers = (storeOptions) => {
   return {
     add: async ({ subject = "", altnames = [] }) => {
       altnames = altnames.length === 0 ? [subject] : altnames;
-      storeOptions.db = await getDB(storeOptions);
-      return storeOptions.db.Domain.create({
+      let db = await getDB(storeOptions);
+      return db.Domain.create({
         subject: subject,
         altnames: altnames.join(","),
         renewAt: 1,
@@ -114,7 +114,7 @@ module.exports.handlers = (storeOptions) => {
 
     // @params sub: subject
     getCertificates: async ( sub = "") => {
-      storeOptions.db = await getDB(storeOptions);
+      let db = await getDB(storeOptions);
         
       const certificates = {
           ca: '',
@@ -122,7 +122,7 @@ module.exports.handlers = (storeOptions) => {
           key: ''
       }
       try {
-        const certificateData = await storeOptions.db.Certificate.findOne({
+        const certificateData = await db.Certificate.findOne({
           where: {
             subject: sub,
           },
@@ -130,7 +130,7 @@ module.exports.handlers = (storeOptions) => {
             exclude: ["createdAt", "updatedAt"],
           },
           include: {
-            model: storeOptions.db.Chain,
+            model:db.Chain,
           },
         });
         // console.log(certificateData);
@@ -142,7 +142,7 @@ module.exports.handlers = (storeOptions) => {
             certificates['ca'] = obj.Chain.content;
             certificates['cert'] = obj.cert;
             
-            const keyContent = await storeOptions.db.Keypair.findOne({
+            const keyContent = await db.Keypair.findOne({
                 where: {
                     xid: sub // Don't use xid of chain. They do not link
                 }
@@ -179,8 +179,8 @@ module.exports.handlers = (storeOptions) => {
       }
     },
     getDB: async ()=>{
-        storeOptions.db = await getDB(storeOptions);
-        return storeOptions.db;
+        let db = await getDB(storeOptions);
+        return db;
     }
   };
 };

@@ -79,8 +79,22 @@ const storeOptions = {
   // Pass the same objects that you have passed to storeDefaults
 };
 const glx = require("@thingsup/greenlock-sql-manager");
-const { add, getCertificates, getDB } = glx.handles(storeOptions);
+const { add, getCertificates, getDB, remove, removeAll, getAll } =
+  glx.handles(storeOptions);
 // List of the functions that we currently support.
+```
+
+### Get list of Domains Added
+
+To get all sites,
+
+```js
+try {
+  console.log(await getAll());
+  // List of all domains which is currently added ie ['abc.com','abc2.com','abc3.com']
+} catch (err) {
+  console.log("Unable to get sites");
+}
 ```
 
 ### Adding Sites
@@ -96,6 +110,28 @@ try {
   console.log("Site added");
 } catch (err) {
   console.log("Unable to add sites");
+}
+```
+
+### Remove a site
+
+```js
+try {
+  await remove("abc.com");
+  // Remove this site from db.
+} catch (err) {
+  console.log("Unable to get sites");
+}
+```
+
+### Remove all sites
+
+```js
+try {
+  await removeAll();
+  // Remove all the sites.
+} catch (err) {
+  console.log("Unable to get sites");
 }
 ```
 

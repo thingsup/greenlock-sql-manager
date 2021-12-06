@@ -2,7 +2,7 @@
 
 const { getDB } = require("../greenlockStore");
 const db = require("../greenlockStore/db");
-const {Op}  = require('sequelize');
+const { Op } = require("sequelize");
 const domain = require("../greenlockStore/db/domain");
 const getDefaults = (opts) => {
   const { storeDefaults = {}, defaults: m_defaults = {} } = opts;
@@ -114,77 +114,74 @@ module.exports.handlers = (storeOptions) => {
       });
     },
 
-    getAll:async ()=>{
+    getAll: async () => {
       let db = await getDB(storeOptions);
 
       const data = await db.Domain.findAll({
-        attributes: ['subject'],
+        attributes: ["subject"],
       });
-      const domains = data.map((datum)=>{
-        return datum.subject;
-      })
+      const domains = [];
+      data.forEach((datum) => {
+        return domains.push(datum.subject);
+      });
       return domains;
     },
 
-    removeAll:async ()=>{
+    removeAll: async () => {
       let db = await getDB(storeOptions);
-      
 
       await db.Domain.destroy({
         where: {},
-        truncate: true
-      })
-      
+        truncate: true,
+      });
+
       await db.Certificate.destroy({
         where: {},
-        truncate: true
-      })
+      });
 
       await db.Chain.destroy({
         where: {},
-        truncate: true
-      })
+      });
 
       await db.Keypair.destroy({
         where: {},
-        truncate: true
-      })
+        truncate: true,
+      });
 
       return null;
-      
     },
 
-    remove: async (subject='')=>{
+    remove: async (subject = "") => {
       let db = await getDB(storeOptions);
-      
+
       await db.Domain.destroy({
         where: {
-          subject: subject
+          subject: subject,
         },
-      })
-      
+      });
+
       await db.Certificate.destroy({
         where: {
-          subject: subject
+          subject: subject,
         },
-      })
+      });
 
       await db.Keypair.destroy({
         where: {
-          xid: subject
+          xid: subject,
         },
-      })
+      });
       return null;
     },
     // @params sub: subject
-    getCertificates: async ( sub = "") => {
+    getCertificates: async (sub = "") => {
       let db = await getDB(storeOptions);
-        
+
       const certificates = {
-          ca: '',
-          cert: '',
-          key: ''
-      }
+        ca: "",
+        cert: "",
+        key: "",
+      };
       try {
         const certificateData = await db.Certificate.findOne({
           where: {
@@ -194,7 +191,7 @@ module.exports.handlers = (storeOptions) => {
             exclude: ["createdAt", "updatedAt"],
           },
           include: {
-            model:db.Chain,
+            model: db.Chain,
           },
         });
         // console.log(certificateData);
@@ -203,27 +200,25 @@ module.exports.handlers = (storeOptions) => {
           // console.log(obj);
           if (obj.Chain) {
             obj.Chain = obj.Chain.get();
-            certificates['ca'] = obj.Chain.content;
-            certificates['cert'] = obj.cert;
-            
+            certificates["ca"] = obj.Chain.content;
+            certificates["cert"] = obj.cert;
+
             const keyContent = await db.Keypair.findOne({
-                where: {
-                    xid: sub // Don't use xid of chain. They do not link
-                }
+              where: {
+                xid: sub, // Don't use xid of chain. They do not link
+              },
             });
 
             // console.log(keyContent);
-            if(keyContent){
+            if (keyContent) {
               const keyObj = keyContent.get();
-              if(keyObj){
-                certificates['key'] = JSON.parse(keyObj.content).privateKeyPem;
-              }else{
-                throw 'Record Not Exist';
-
+              if (keyObj) {
+                certificates["key"] = JSON.parse(keyObj.content).privateKeyPem;
+              } else {
+                throw "Record Not Exist";
               }
-            }else{
-                throw 'Record Not Exist';
-
+            } else {
+              throw "Record Not Exist";
             }
 
             // if(keyObj){
@@ -232,8 +227,8 @@ module.exports.handlers = (storeOptions) => {
             // }
 
             return certificates;
-          }else{
-              throw 'Record Not Exist';
+          } else {
+            throw "Record Not Exist";
           }
         } else {
           throw "Record Not Exist";
@@ -242,9 +237,9 @@ module.exports.handlers = (storeOptions) => {
         return null;
       }
     },
-    getDB: async ()=>{
-        let db = await getDB(storeOptions);
-        return db;
-    }
+    getDB: async () => {
+      let db = await getDB(storeOptions);
+      return db;
+    },
   };
 };

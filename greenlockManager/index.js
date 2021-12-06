@@ -1,7 +1,9 @@
 "use strict";
 
 const { getDB } = require("../greenlockStore");
-
+const db = require("../greenlockStore/db");
+const {Op}  = require('sequelize');
+const domain = require("../greenlockStore/db/domain");
 const getDefaults = (opts) => {
   const { storeDefaults = {}, defaults: m_defaults = {} } = opts;
   let defaults = {
@@ -112,6 +114,68 @@ module.exports.handlers = (storeOptions) => {
       });
     },
 
+    getAll:async ()=>{
+      let db = await getDB(storeOptions);
+
+      const data = await db.Domain.findAll({
+        attributes: ['subject'],
+      });
+      const domains = data.map((datum)=>{
+        return datum.subject;
+      })
+      return domains;
+    },
+
+    removeAll:async ()=>{
+      let db = await getDB(storeOptions);
+      
+
+      await db.Domain.destroy({
+        where: {},
+        truncate: true
+      })
+      
+      await db.Certificate.destroy({
+        where: {},
+        truncate: true
+      })
+
+      await db.Chain.destroy({
+        where: {},
+        truncate: true
+      })
+
+      await db.Keypair.destroy({
+        where: {},
+        truncate: true
+      })
+
+      return null;
+      
+    },
+
+    remove: async (subject='')=>{
+      let db = await getDB(storeOptions);
+      
+      await db.Domain.destroy({
+        where: {
+          subject: subject
+        },
+      })
+      
+      await db.Certificate.destroy({
+        where: {
+          subject: subject
+        },
+      })
+
+      await db.Keypair.destroy({
+        where: {
+          xid: subject
+        },
+      })
+      return null;
+    },
     // @params sub: subject
     getCertificates: async ( sub = "") => {
       let db = await getDB(storeOptions);

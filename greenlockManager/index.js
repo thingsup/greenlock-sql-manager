@@ -1,9 +1,6 @@
 "use strict";
 
 const { getDB } = require("../greenlockStore");
-const db = require("../greenlockStore/db");
-const { Op } = require("sequelize");
-const domain = require("../greenlockStore/db/domain");
 const getDefaults = (opts) => {
   const { storeDefaults = {}, defaults: m_defaults = {} } = opts;
   let defaults = {

@@ -1,3 +1,6 @@
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/thingsup/greenlock-sql-manager.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/thingsup/greenlock-sql-manager/alerts/)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/thingsup/greenlock-sql-manager.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/thingsup/greenlock-sql-manager/context:javascript)
+
 # [@thingsup/greenlock-sql-manager](https://github.com/thingsup/greenlock-sql-manager)
 
 > A database-driven Greenlock storage plugin and manager.
